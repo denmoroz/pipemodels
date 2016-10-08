@@ -1,6 +1,9 @@
+import collections
+
 import importlib
 import hashlib
-import pickle
+
+import json
 
 
 def file_checksum(filename, block_size=2**20):
@@ -17,7 +20,15 @@ def file_checksum(filename, block_size=2**20):
 
 
 def object_checksum(obj):
-    return hashlib.md5(pickle.dumps(obj)).hexdigest()
+    if isinstance(obj, str):
+        str_value = obj
+    else:
+        if isinstance(obj, collections.Mapping):
+            obj = dict(obj)
+
+        str_value = json.dumps(obj, sort_keys=True).lower()
+
+    return hashlib.md5(str_value.encode('ascii')).hexdigest()
 
 
 def split_object_path(object_path):
